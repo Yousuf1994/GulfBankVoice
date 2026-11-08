@@ -15,7 +15,18 @@
       "Bash(git branch *)",
       "Bash(elevenlabs agents status *)",
       "Bash(elevenlabs agents pull *)",
-      "Bash(elevenlabs agents list *)"
+      "Bash(elevenlabs agents list *)",
+      "Bash(npx *)",
+      "Bash(git init *)",
+      "Bash(git init)",
+      "Bash(git remote *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(elevenlabs agents add *)",
+      "Bash(elevenlabs agents init *)",
+      "Bash(elevenlabs agents init)",
+      "Bash(elevenlabs auth whoami)",
+      "mcp__neon__*"
     ],
     "ask": [
       "Bash(git push)",
@@ -24,7 +35,11 @@
       "Bash(elevenlabs agents push)",
       "Bash(elevenlabs agents push *)",
       "Bash(vercel *)",
-      "Bash(npx *)"
+      "mcp__vercel__*",
+      "mcp__neon__delete_project",
+      "mcp__neon__delete_branch",
+      "mcp__neon__reset_from_parent",
+      "mcp__neon__create_project"
     ],
     "deny": [
       "Read(./.env.local)",
@@ -35,7 +50,24 @@
       "Bash(git push -f *)",
       "Bash(git reset --hard *)",
       "Bash(rm -rf *)",
-      "Bash(elevenlabs agents delete *)"
+      "Bash(elevenlabs agents delete *)",
+      "mcp__vercel__get_project_env",
+      "mcp__vercel__get_shared_env_var",
+      "mcp__vercel__filter_project_envs",
+      "mcp__vercel__create_project_env",
+      "mcp__vercel__edit_project_env",
+      "mcp__neon__get_connection_string",
+      "Bash(cat .env*)",
+      "Bash(type .env*)",
+      "Bash(Get-Content .env*)",
+      "Bash(printenv*)",
+      "Bash(env)",
+      "Bash(vercel env pull*)",
+      "Bash(neonctl connection-string*)",
+      "Read(./.env.development.local)",
+      "Read(./.env.production.local)",
+      "Edit(./.env.development.local)",
+      "Edit(./.env.production.local)"
     ]
   }
 }
