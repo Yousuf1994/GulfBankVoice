@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@elevenlabs/client": "^1.35.0",
+    "@elevenlabs/elevenlabs-js": "^2.77.0",
+    "@elevenlabs/react": "^1.21.1",
     "next": "16.4.5",
     "pg": "^8.23.1",
     "react": "19.3.0",
