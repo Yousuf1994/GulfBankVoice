@@ -4,7 +4,7 @@ Read this at the start of every session. Current phase, decisions made, open que
 
 ## Current status
 
-**Phase 1: Project skeleton, online** — in progress (build step, not yet reviewed).
+**Phase 1: Project skeleton, online** — Done, approved by Yousuf. Moving to Phase 2 (mock bank and back office): plan written, waiting on his approval to build.
 
 ## Decisions made
 
@@ -18,8 +18,8 @@ Read this at the start of every session. Current phase, decisions made, open que
 - Run `elevenlabs auth login` himself (needs interactive browser login).
 - Create `.env.local` with his real `ELEVENLABS_API_KEY` once he has one (not needed until Phase 3, but the file should exist locally so Next.js doesn't warn).
 - Import the GitHub repo into Vercel (he said he'd do this himself).
-- Review and approve Phase 1 (see chat for the full report) before I move to Phase 2.
+- Add the Postgres database (Vercel Storage tab) before Phase 2 can connect to it.
 
 ## Phase history
 
-- Phase 1: started 2026-11-08.
+- Phase 1 (Project skeleton, online): started and finished 2026-11-08. Approved by Yousuf. Next.js app on `main` at github.com/Yousuf1994/GulfBankVoice; ElevenLabs skills and CLI installed; home page placeholder live.

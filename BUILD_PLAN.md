@@ -7,7 +7,7 @@ How to build the product described in `PRD.md`, in eight phases, using Claude Co
 | Phase | What you get | Status |
 |---|---|---|
 | 0 | Accounts and tools ready | Not started |
-| 1 | Project skeleton, online | Not started |
+| 1 | Project skeleton, online | Done |
 | 2 | Mock bank and back office | Not started |
 | 3 | Noor answers, verifies, handles cards | Not started |
 | 4 | Transaction memory | Not started |
