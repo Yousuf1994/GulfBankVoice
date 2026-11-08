@@ -4,7 +4,7 @@ Read this at the start of every session. Current phase, decisions made, open que
 
 ## Current status
 
-**Phase 2: Mock bank and back office** — Done, approved by Yousuf, merged into `main`.
+**Phase 3: Noor answers, verifies, handles cards** — built and server-tested on branch `phase-3-noor-cards`, pushed. Waiting on Yousuf to set up one ElevenLabs workspace secret, then give the go-ahead for the one live ElevenLabs push this phase needs (creating the agent and 8 remaining tools).
 
 ## Decisions made
 
@@ -19,13 +19,25 @@ Read this at the start of every session. Current phase, decisions made, open que
 - **Vercel environment variable names are case-sensitive.** Yousuf first added the secret as `Tool_secret`, which our code (looking for exact-case `TOOL_SECRET`) never saw. Lesson for future env vars: double-check the exact capitalization typed into Vercel matches `.env.example`.
 - **The Neon-via-Vercel Postgres integration only granted `POSTGRES_URL` to Production and Preview, not Development**, and that scoping wasn't editable from the plain Environment Variables screen (grayed out, managed by the integration). Rather than dig further into the integration's own settings, we tested against a live Preview deployment instead of `npm run dev` locally — `vercel curl <path> --deployment <url>` authenticates through the logged-in Vercel CLI session and bypasses the deployment-protection login wall, so no local database connection was needed for Phase 2's own tests. **Still open:** local `npm run dev` can't reach the database until someone finds where to add Development to the Postgres integration's scope (or we add a second, manually-created `POSTGRES_URL` variable scoped to Development only, pointing at the same database) — not urgent since Phase 3 testing can likely keep using Preview deployments the same way.
 
+- **Mistake, caught and logged:** one `elevenlabs tools add ... --dry-run` call did NOT stay local despite the flag's description — it created a real empty placeholder tool (`request_verification`) on Yousuf's live ElevenLabs account. No further CLI commands that touch the live platform were run after that; everything else this phase (8 more tool configs, the agent config, the workflow, two tests) was hand-written as local JSON files, informed by the one real example that mistake produced. The placeholder is being reused (given its real content) rather than left as orphaned clutter.
+- **Tool request format:** ElevenLabs webhook tools call endpoints with a JSON envelope (`{tool_call_id, tool_name, parameters, conversation_id}`), not a plain REST `GET` with a URL path parameter. So Phase 3's 9 tool endpoints are new (`/api/tools/*`), separate from Phase 2's three `/api/customers/[id]/*` endpoints, which are left untouched.
+- **Identity binding:** `customer_id` is marked `"dynamic_variable": "customer_id"` in every tool's request body schema (an ElevenLabs feature for exactly this), not LLM-supplied and not something the caller can override by saying a different name out loud — matches CLAUDE.md's identity rule.
+- **Verification validity windows:** level 1 approval lasts 30 minutes once granted, level 2 lasts the PRD's specified 5 minutes. A level 2 approval also satisfies any level 1 check (≥ comparison), so Cards doesn't need to separately request level 1 before level 2.
+- **Card ownership check:** every card-mutating tool looks up the card through a join on `accounts.customer_id`, so even a customer with a valid approval of their own can't touch another customer's card ID. Verified live (Priya, with her own valid level 2, correctly got "could not find that card" trying to touch Ahmed's).
+- **Tool-activity panel:** built on the SDK's own `onAgentToolRequest`/`onAgentToolResponse` callbacks (real-time, no polling) rather than polling the audit log — found these existed by reading the SDK's type definitions directly rather than guessing.
+- **Workflow JSON schema:** the installed skill's own example used an array-based `nodes`/`edges` shape; the real schema (confirmed by fetching ElevenLabs' own docs) uses keyed objects with `source`/`target`/`forward_condition` on edges and `edge_order` on nodes. Used the verified real schema, not the skill's shorthand example.
+- **Tool secret in ElevenLabs:** referenced via `{"env_var_label": "tool_secret"}` in each tool's headers (never the literal value, in any committed file). This needs a matching workspace secret set up in ElevenLabs's dashboard (Developers → Environment Variables) before the real push — exact steps given to Yousuf when we reached that point.
+
 ## Open questions / waiting on Yousuf
 
-- Run `elevenlabs auth login` himself (needs interactive browser login).
-- Create `.env.local` with his real `ELEVENLABS_API_KEY` once he has one (not needed until Phase 3, but the file should exist locally so Next.js doesn't warn). Note: `.env.local` now exists (created via `vercel env pull`), so this just means adding one more line to it.
+- Run `elevenlabs auth login` himself (needs interactive browser login). **Done** — confirmed via `elevenlabs auth status`.
+- Create `.env.local` with his real `ELEVENLABS_API_KEY`. **Done** — also added `ELEVENLABS_API_KEY` (with ElevenAgents permission set to Write, everything else No Access) and will need `ELEVENLABS_AGENT_ID` once the agent is actually created.
 - Local dev (`npm run dev`) still can't reach the database — see the Postgres/Development scoping note above. Not blocking, since we've been testing via Preview deployments.
+- Set up the `tool_secret` workspace secret in ElevenLabs (Developers → Environment Variables → Add variable → type Secret → label `tool_secret`, same value as Vercel's `TOOL_SECRET`).
+- Give the go-ahead for the live ElevenLabs push (creates the agent + 8 remaining tools). After that, Yousuf adds the real `ELEVENLABS_AGENT_ID` to `.env.local`/Vercel, and picks Noor's real voice by ear in the dashboard.
 
 ## Phase history
 
 - Phase 1 (Project skeleton, online): started and finished 2026-11-08. Approved by Yousuf. Next.js app on `main` at github.com/Yousuf1994/GulfBankVoice; ElevenLabs skills and CLI installed; home page placeholder live.
 - Phase 2 (Mock bank and back office): started and finished 2026-11-08. Approved by Yousuf, merged into `main`. Database schema, seed data, three tool endpoints, and `/backoffice` all verified against a live Vercel Preview deployment with a real Postgres (Neon) database — reset, auth checks (401 on missing/wrong secret, 200 on correct), and all three personas' data confirmed correct.
+- Phase 3 (Noor answers, verifies, handles cards): started 2026-11-08, built and pushed to branch `phase-3-noor-cards`. Server-side verification, 9 tool endpoints, signed-url route, and `/call` page all built and verified against a live Preview deployment (reset, level 1/2 approval and expiry, correct-tool-for-correct-card, cross-customer ownership protection, missing-secret rejection all confirmed). Noor's agent config, 9 tool configs, and 2 tests written as local JSON, not yet pushed to ElevenLabs -- waiting on Yousuf's workspace secret setup and go-ahead.
