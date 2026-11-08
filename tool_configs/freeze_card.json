@@ -1,0 +1,35 @@
+{
+    "api_schema": {
+        "method": "POST",
+        "request_body_schema": {
+            "description": "Request body for the webhook",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "dynamic_variable": "customer_id"
+                },
+                "card_id": {
+                    "type": "string",
+                    "description": "The card's id, from list_cards."
+                }
+            },
+            "required": ["card_id"],
+            "type": "object"
+        },
+        "request_headers": {
+            "Content-Type": "application/json",
+            "X-Tool-Secret": { "env_var_label": "tool_secret" }
+        },
+        "url": "https://gulfbankvoice.vercel.app/api/tools/freeze-card"
+    },
+    "assignments": [],
+    "description": "Temporarily freeze a card. Confirm the card (last 4 digits and holder name) with the customer before calling this. Needs a fresh level 2 approval -- call request_verification with level 2 first if you don't have one yet.",
+    "disable_interruptions": false,
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    },
+    "force_pre_tool_speech": false,
+    "name": "freeze_card",
+    "response_timeout_secs": 15,
+    "type": "webhook"
+}

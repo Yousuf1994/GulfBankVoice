@@ -1,0 +1,31 @@
+{
+    "api_schema": {
+        "method": "POST",
+        "request_body_schema": {
+            "description": "Request body for the webhook",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "dynamic_variable": "customer_id"
+                }
+            },
+            "required": [],
+            "type": "object"
+        },
+        "request_headers": {
+            "Content-Type": "application/json",
+            "X-Tool-Secret": { "env_var_label": "tool_secret" }
+        },
+        "url": "https://gulfbankvoice.vercel.app/api/tools/list-cards"
+    },
+    "assignments": [],
+    "description": "List the customer's cards (primary and supplementary) with last 4 digits, holder, type, and status. Use before freezing, unfreezing, or blocking a card, or when the customer asks what cards they have. Needs at least a level 1 approval -- call request_verification first if you don't have one yet.",
+    "disable_interruptions": false,
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    },
+    "force_pre_tool_speech": false,
+    "name": "list_cards",
+    "response_timeout_secs": 15,
+    "type": "webhook"
+}

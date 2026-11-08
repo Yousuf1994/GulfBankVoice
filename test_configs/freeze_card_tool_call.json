@@ -1,0 +1,25 @@
+{
+    "name": "Freezing a card calls freeze_card for the right card",
+    "type": "tool",
+    "chat_history": [
+        { "role": "user", "message": "What cards do I have on my account?", "time_in_call_secs": 5 },
+        {
+            "role": "agent",
+            "message": "You have your own credit card ending 4821, and a supplementary card for Fatima ending 7734.",
+            "time_in_call_secs": 9
+        },
+        { "role": "user", "message": "Please freeze my card, the one ending 4821, I think I lost it.", "time_in_call_secs": 16 }
+    ],
+    "tool_call_parameters": {
+        "referenced_tool": { "id": "TOOL_ID:freeze_card", "type": "webhook" },
+        "parameters": [
+            {
+                "path": "card_id",
+                "eval": {
+                    "type": "llm",
+                    "description": "Should identify the customer's own card ending 4821, not Fatima's supplementary card ending 7734."
+                }
+            }
+        ]
+    }
+}

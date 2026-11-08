@@ -1,0 +1,44 @@
+{
+    "api_schema": {
+        "method": "POST",
+        "request_body_schema": {
+            "description": "Request body for the webhook",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "dynamic_variable": "customer_id"
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "Short reason code, e.g. 'wants human', 'complex dispute'."
+                },
+                "summary": {
+                    "type": "string",
+                    "description": "A few sentences summarizing the conversation so far, for the human agent who calls back."
+                },
+                "priority": {
+                    "type": "string",
+                    "enum": ["low", "normal", "high"],
+                    "description": "How urgent this is. Default to normal unless the customer is distressed or it's fraud-related."
+                }
+            },
+            "required": ["reason", "summary"],
+            "type": "object"
+        },
+        "request_headers": {
+            "Content-Type": "application/json",
+            "X-Tool-Secret": { "env_var_label": "tool_secret" }
+        },
+        "url": "https://gulfbankvoice.vercel.app/api/tools/create-handoff-ticket"
+    },
+    "assignments": [],
+    "description": "Log a callback request for a human agent. Use when the customer asks for a human, or when you can't resolve something yourself.",
+    "disable_interruptions": false,
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    },
+    "force_pre_tool_speech": false,
+    "name": "create_handoff_ticket",
+    "response_timeout_secs": 15,
+    "type": "webhook"
+}

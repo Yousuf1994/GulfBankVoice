@@ -1,0 +1,35 @@
+{
+    "api_schema": {
+        "method": "POST",
+        "request_body_schema": {
+            "description": "Request body for the webhook",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "dynamic_variable": "customer_id"
+                },
+                "card_id": {
+                    "type": "string",
+                    "description": "The id of the card being replaced (the one just blocked, lost, stolen, or damaged)."
+                }
+            },
+            "required": ["card_id"],
+            "type": "object"
+        },
+        "request_headers": {
+            "Content-Type": "application/json",
+            "X-Tool-Secret": { "env_var_label": "tool_secret" }
+        },
+        "url": "https://gulfbankvoice.vercel.app/api/tools/request-replacement-card"
+    },
+    "assignments": [],
+    "description": "Order a replacement for a card. Only call this after the customer agrees to a replacement -- usually right after block_card. Needs a fresh level 2 approval.",
+    "disable_interruptions": false,
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    },
+    "force_pre_tool_speech": false,
+    "name": "request_replacement_card",
+    "response_timeout_secs": 15,
+    "type": "webhook"
+}

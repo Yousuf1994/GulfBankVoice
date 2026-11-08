@@ -1,0 +1,31 @@
+{
+    "api_schema": {
+        "method": "POST",
+        "request_body_schema": {
+            "description": "Request body for the webhook",
+            "properties": {
+                "verification_id": {
+                    "type": "string",
+                    "description": "The verification_id returned by request_verification."
+                }
+            },
+            "required": ["verification_id"],
+            "type": "object"
+        },
+        "request_headers": {
+            "Content-Type": "application/json",
+            "X-Tool-Secret": { "env_var_label": "tool_secret" }
+        },
+        "url": "https://gulfbankvoice.vercel.app/api/tools/check-verification"
+    },
+    "assignments": [],
+    "description": "Check whether a previously requested approval has been approved, denied, is still pending, or expired. Call this after asking the customer to approve in their app, or after some time has passed.",
+    "disable_interruptions": false,
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    },
+    "force_pre_tool_speech": false,
+    "name": "check_verification",
+    "response_timeout_secs": 15,
+    "type": "webhook"
+}

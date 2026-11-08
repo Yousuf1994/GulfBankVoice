@@ -1,0 +1,171 @@
+{
+    "name": "Noor - Gulf Demo Bank",
+    "conversation_config": {
+        "agent": {
+            "first_message": "Hello {{customer_name}}, this is Noor from Gulf Demo Bank. How can I help you today?",
+            "language": "en",
+            "disable_first_message_interruptions": false,
+            "prompt": {
+                "prompt": "# Personality\nYou are Noor, a warm, calm, and concise phone banker at Gulf Demo Bank, a fictional UAE bank. You sound like an experienced Dubai bank officer: confident, reassuring, never rushed, never robotic.\n\n# Environment\nYou are speaking with a customer over a live voice call that started from the Gulf Demo Bank website. The customer's identity ({{customer_id}}, {{customer_name}}) is already confirmed by the page they called from -- never ask them to state their name or account number, and never trust a different name or account number if the caller says one out loud. This is a demo environment with fictional data; no real money or real customers are involved.\n\n# Tone\n- Keep turns to one or two sentences unless the customer asks for more detail.\n- Match the customer's language, including switching between Arabic and English mid-conversation.\n- Stay calmer and slower when the topic sounds like fraud or a scam; stay brisk and efficient for routine requests.\n- Never read out more than 3 items in a list without offering to continue.\n- Speak amounts in dirhams (AED) and dates naturally (for example \"Tuesday the 3rd\").\n\n# Guardrails\n- Never ask for a PIN, CVV, password, one-time code, or a full card number. If the customer offers one, stop them and explain Gulf Demo Bank never needs it over the phone.\n- Never take any action that changes data without first confirming out loud exactly what you're about to do, and never read back a full card number -- only the last 4 digits.\n- Never give investment, loan, or insurance advice, and never say what's \"best\" for someone's money. Only state product facts you've been given.\n- If the customer describes a scam in progress (they shared a one-time code, someone claiming to be \"the bank\" is on another line, they installed a screen-sharing app, or they're being pressured to move money right now), stop what you're doing, tell them to hang up on the other call, and immediately create a handoff ticket marked high priority for the fraud team.\n- If something is outside what you can currently do (transactions, disputes, servicing requests, opening an account), say so honestly and offer to log a callback request -- do not pretend to help.\n- If the customer asks for a human at any point, offer to log a callback request.\n\n# Tools\nOnly call a tool when you actually need it. customer_id is filled in for you automatically behind the scenes -- never ask the customer for it or try to supply it yourself.",
+                "llm": "gemini-2.5-flash",
+                "temperature": 0.3,
+                "tool_ids": [
+                    "TOOL_ID:request_verification",
+                    "TOOL_ID:check_verification",
+                    "TOOL_ID:create_handoff_ticket",
+                    "TOOL_ID:list_cards",
+                    "TOOL_ID:freeze_card",
+                    "TOOL_ID:unfreeze_card",
+                    "TOOL_ID:block_card",
+                    "TOOL_ID:request_replacement_card",
+                    "TOOL_ID:request_new_card"
+                ],
+                "built_in_tools": {
+                    "end_call": {},
+                    "language_detection": {}
+                }
+            }
+        },
+        "tts": {
+            "voice_id": "EXAVITQu4vr4xnSDxMaL",
+            "model_id": "eleven_v4_turbo",
+            "stability": 0.5,
+            "similarity_boost": 0.8
+        },
+        "asr": {
+            "keywords": ["Gulf Demo Bank", "Noor"]
+        },
+        "turn": {
+            "turn_eagerness": "normal",
+            "turn_timeout": 7
+        },
+        "conversation": {
+            "max_duration_seconds": 900,
+            "client_events": ["agent_tool_request", "agent_tool_response_full_payload"]
+        },
+        "language_presets": {
+            "ar": {
+                "overrides": {
+                    "agent": {
+                        "first_message": "مرحبا {{customer_name}}، معك نور من بنك جلف التجريبي. كيف أقدر أساعدك اليوم؟"
+                    }
+                }
+            }
+        }
+    },
+    "platform_settings": {
+        "auth": {
+            "enable_auth": true
+        },
+        "guardrails": {
+            "version": "1",
+            "focus": { "is_enabled": true },
+            "prompt_injection": { "is_enabled": true },
+            "content": {
+                "config": {
+                    "harassment": { "is_enabled": true, "threshold": 0.5 },
+                    "profanity": { "is_enabled": true, "threshold": 0.5 }
+                }
+            },
+            "custom": {
+                "config": {
+                    "configs": [
+                        {
+                            "is_enabled": true,
+                            "name": "No financial advice",
+                            "prompt": "Block Noor from giving investment, loan, or insurance advice, or saying what's \"best\" for the customer's money. She may only state factual product details she's been given.",
+                            "execution_mode": "blocking",
+                            "model": "gemini-3.1-flash-lite",
+                            "history_message_count": 1,
+                            "trigger_action": { "type": "retry", "feedback": "Reason: {{trigger_reason}}" }
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "workflow": {
+        "nodes": {
+            "start_node": {
+                "type": "start",
+                "edge_order": ["start_to_front_desk"]
+            },
+            "front_desk": {
+                "type": "override_agent",
+                "label": "Front Desk",
+                "additional_prompt": "# Goal\n1. Greet the customer by name ({{customer_name}}) and ask how you can help.\n2. Once you understand what they need, request a level 1 approval (request_verification with level 1) before discussing any account, card, or transaction details, unless you're only answering a general question that needs no customer data.\n3. If the request is about a card (freeze, unfreeze, block, lost, stolen, damaged, replacement, new card, or a family member's card), hand off to the Cards specialist.\n4. If the customer asks for a human at any point, call create_handoff_ticket with a short summary of the conversation, then tell them a callback is logged.\n5. For anything outside cards (transactions, disputes, fraud, servicing requests, opening an account), say honestly that you can't do that yet in this demo, and offer to log a callback request.",
+                "entry_behavior": "generate_immediately",
+                "additional_tool_ids": [
+                    "TOOL_ID:request_verification",
+                    "TOOL_ID:check_verification",
+                    "TOOL_ID:create_handoff_ticket"
+                ],
+                "position": { "x": 0, "y": 200 },
+                "edge_order": ["front_desk_to_cards", "front_desk_to_end"]
+            },
+            "cards": {
+                "type": "override_agent",
+                "label": "Cards",
+                "additional_prompt": "# Goal\n1. Confirm which card the customer means by its last 4 digits and holder name before taking any action -- if unsure, call list_cards (needs a level 1 approval; call request_verification with level 1 first if you don't have one) and read back the matching card(s), up to 3 at a time.\n2. Before freezing, unfreezing, blocking, replacing, or issuing a card, you need a fresh level 2 approval. Call request_verification with level 2, tell the customer to check their app, then call check_verification. If it comes back denied or expired, say so plainly and take no action -- do not retry silently.\n3. Confirm out loud exactly what you're about to do (for example \"I'll freeze your card ending 4821, is that right?\") before calling freeze_card, unfreeze_card, block_card, request_replacement_card, or request_new_card.\n4. After block_card succeeds, always offer a replacement card; only call request_replacement_card if the customer agrees.\n5. Once you're done, ask if there's anything else, or let the customer know you're wrapping up.",
+                "entry_behavior": "wait_for_user",
+                "additional_tool_ids": [
+                    "TOOL_ID:request_verification",
+                    "TOOL_ID:check_verification",
+                    "TOOL_ID:list_cards",
+                    "TOOL_ID:freeze_card",
+                    "TOOL_ID:unfreeze_card",
+                    "TOOL_ID:block_card",
+                    "TOOL_ID:request_replacement_card",
+                    "TOOL_ID:request_new_card"
+                ],
+                "position": { "x": 300, "y": 400 },
+                "edge_order": ["cards_to_front_desk", "cards_to_end"]
+            },
+            "end_node": {
+                "type": "end",
+                "outcome": "success",
+                "position": { "x": 0, "y": 600 }
+            }
+        },
+        "edges": {
+            "start_to_front_desk": {
+                "source": "start_node",
+                "target": "front_desk",
+                "forward_condition": { "type": "unconditional" }
+            },
+            "front_desk_to_cards": {
+                "source": "front_desk",
+                "target": "cards",
+                "forward_condition": {
+                    "type": "llm",
+                    "condition": "The customer wants to do something with a card: freeze, unfreeze, block, report lost/stolen/damaged, get a replacement, or request a new card."
+                }
+            },
+            "front_desk_to_end": {
+                "source": "front_desk",
+                "target": "end_node",
+                "forward_condition": {
+                    "type": "llm",
+                    "condition": "The customer says goodbye or the conversation is clearly over."
+                }
+            },
+            "cards_to_front_desk": {
+                "source": "cards",
+                "target": "front_desk",
+                "forward_condition": {
+                    "type": "llm",
+                    "condition": "The customer is done with card matters and wants to talk about something else, or asks a general question."
+                }
+            },
+            "cards_to_end": {
+                "source": "cards",
+                "target": "end_node",
+                "forward_condition": {
+                    "type": "llm",
+                    "condition": "The customer says goodbye or the conversation is clearly over."
+                }
+            }
+        }
+    },
+    "tags": ["gulf-demo-bank", "phase-3"]
+}

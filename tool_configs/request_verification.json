@@ -1,0 +1,36 @@
+{
+    "api_schema": {
+        "method": "POST",
+        "request_body_schema": {
+            "description": "Request body for the webhook",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "dynamic_variable": "customer_id"
+                },
+                "level": {
+                    "type": "integer",
+                    "enum": [1, 2],
+                    "description": "1 to let the customer read their account data, 2 to let them change anything."
+                }
+            },
+            "required": ["level"],
+            "type": "object"
+        },
+        "request_headers": {
+            "Content-Type": "application/json",
+            "X-Tool-Secret": { "env_var_label": "tool_secret" }
+        },
+        "url": "https://gulfbankvoice.vercel.app/api/tools/request-verification"
+    },
+    "assignments": [],
+    "description": "Send an approval request to the customer's banking app. Use level 1 before reading any account, card, or transaction data. Use level 2 before making any change (freezing, unfreezing, blocking, replacing, or requesting a card). Tell the customer to check their app, then call check_verification.",
+    "disable_interruptions": false,
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    },
+    "force_pre_tool_speech": false,
+    "name": "request_verification",
+    "response_timeout_secs": 15,
+    "type": "webhook"
+}

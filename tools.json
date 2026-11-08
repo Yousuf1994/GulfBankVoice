@@ -1,0 +1,9 @@
+{
+    "tools": [
+        {
+            "type": "webhook",
+            "config": "tool_configs\\request_verification.json",
+            "id": "tool_6201m6xjm8y2etptf5p74ftw814k"
+        }
+    ]
+}
